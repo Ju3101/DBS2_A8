@@ -1,0 +1,36 @@
+<persistence xmlns="https://jakarta.ee/xml/ns/persistence"
+			 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+			 xsi:schemaLocation="https://jakarta.ee/xml/ns/persistence https://jakarta.ee/xml/ns/persistence/persistence_3_2.xsd"
+			 version="3.2">
+	<persistence-unit name="movie">
+		<provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+		<class>de.hsh.inform.dbs2.entities.Movie</class>
+		<properties>
+			<property name="jakarta.persistence.jdbc.driver"
+					  value="org.postgresql.Driver" />
+
+			<!--
+			Die folgenden Properties werden im Programm in der Klasse EMFSingleton gesetzt
+			und sind daher hier nicht enthalten:
+
+			<property name="jakarta.persistence.jdbc.url"
+					  value="jdbc:postgresql://pgserv.inform.hs-hannover.de:5432/db01" />
+			<property name="jakarta.persistence.jdbc.user" value="xxxx" />
+			<property name="jakarta.persistence.jdbc.password" value="yyyy" />
+			-->
+
+			<property name="hibernate.show_sql" value="true" />
+			<property name="hibernate.format_sql" value="true" />
+
+			<property name="hibernate.hbm2ddl.auto" value="update" />
+			<!--
+            values:
+            validate: validate the schema, makes no changes to the database.
+            update: update the schema.
+            create: creates the schema, destroying previous data.
+            create-drop: drop the schema when the SessionFactory is closed explicitly, typically when the application is stopped.
+            none: does nothing
+            -->
+		</properties>
+	</persistence-unit>
+</persistence>
