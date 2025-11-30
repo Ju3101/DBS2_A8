@@ -2,6 +2,9 @@ package de.hsh.inform.dbs2.entities;
 
 import jakarta.persistence.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity()
 @Table(name = "UE08_MOVIE")
 public class Movie {
@@ -14,6 +17,9 @@ public class Movie {
     private String type;
 
     private int year;
+
+    @ManyToMany(mappedBy = "movies", cascade = CascadeType.PERSIST)
+    private Set<Genre> genres = new HashSet<>();
 
     public Movie(String title, String type, int year) {
         this.title = title;
@@ -31,5 +37,9 @@ public class Movie {
 
     public Long getId() {
         return id;
+    }
+
+    public Set<Genre> getGenres() {
+        return genres;
     }
 }
