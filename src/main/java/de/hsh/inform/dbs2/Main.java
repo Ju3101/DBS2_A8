@@ -4,6 +4,7 @@ import de.hsh.inform.dbs2.entities.Movie;
 import de.hsh.inform.dbs2.util.EMFSingleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
+import java.util.*;
 
 import java.util.List;
 
