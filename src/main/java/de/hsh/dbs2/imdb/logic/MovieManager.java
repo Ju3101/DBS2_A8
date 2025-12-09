@@ -27,33 +27,10 @@ public class MovieManager {
 	public List<MovieDTO> getMovieList(String search) throws Exception {
 
         try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
-            try {
-                em.getTransaction().begin();
-                List<MovieDTO> dtos = new ArrayList<>();
-                TypedQuery<Movie> tq = em.createQuery("SELECT m FROM Movie AS m WHERE m.title LIKE :search", Movie.class);
-                tq.setParameter("search", search);
-                List<Movie> movies = tq.getResultList();
+            em.getTransaction().begin();
+            HashSet<MovieDTO> dtos = new HashSet<>();
+            List<Movie> movies = em.createQuery("SELECT m FROM Movie AS m WHERE m.title LIKE :search").getResultList();
 
-                //FALL 1: Es wurden keine Movies gefunden --> Alle Movies zurückgeben
-                if (movies.size() == 0) {
-                    TypedQuery<Movie> tqAll = em.createQuery("SELECT m FROM Movie AS m", Movie.class);
-                    for (Movie m : tqAll.getResultList()) {
-                        dtos.add(getMovie(m.getId()));
-                        em.getTransaction().commit();
-                        return dtos;
-                    }
-                }
-
-                //FALL 2: Es wurden Movies gefunden --> Nur bestimmte Movies zurückgeben
-                for (Movie m : movies) {
-                    dtos.add(getMovie(m.getId()));
-                }
-                em.getTransaction().commit();
-                return dtos;
-
-            } catch (Exception e) {
-                em.getTransaction().rollback();
-            }
         }
 
 		return null;
@@ -75,10 +52,13 @@ public class MovieManager {
 			Movie movie = new Movie();
 			movie.setTitle(movieDTO.getTitle());
 			movie.setYear(movieDTO.getYear());
-			movie.setYear(movieDTO.getYear());
-			for(String genre : movieDTO.getGenres()) {
-				movie.getGenres().add(em.find(Genre.class, genre));
-			}
+			movie.setType(movieDTO.getType());
+
+			TypedQuery<Genre> query = em.createQuery("SELECT g  FROM Genre g WHERE g.genre = :genreParam", Genre.class);
+			Set<String> genreName = movieDTO.getGenres();
+			query.setParameter("genreParam", genreName);
+			movie.getGenres().addAll(query.getResultList());
+
 			em.persist(movie);
 			em.getTransaction().commit();
 			em.close();
@@ -123,9 +103,7 @@ public class MovieManager {
             try {
                 em.getTransaction().begin();
                 MovieDTO dto = new MovieDTO();
-                TypedQuery<Movie> tq = em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId", Movie.class);
-                tq.setParameter("movieId", movieId);
-                Movie movie = tq.getSingleResult();
+                Movie movie = (Movie) em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId").getSingleResult();
                 dto.setId(movie.getId());
                 dto.setTitle(movie.getTitle());
                 dto.setType(movie.getType());
