@@ -34,6 +34,18 @@ public class Movie {
 
     }
 
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public void setYear(int year) {
+        this.year = year;
+    }
+
     public String getTitle() {
         return title;
     }
