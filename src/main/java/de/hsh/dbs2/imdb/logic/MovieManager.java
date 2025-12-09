@@ -44,8 +44,25 @@ public class MovieManager {
 	 * @param movieDTO Film-Objekt mit Genres und Charakteren.
 	 * @throws Exception Beschreibt evtl. aufgetretenen Fehler
 	 */
-	public void insertUpdateMovie(MovieDTO movieDTO) throws Exception {		
-		/* TODO */
+	public void insertUpdateMovie(MovieDTO movieDTO) throws Exception {
+		EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager();
+		try {
+			em.getTransaction().begin();
+			Movie movie = new Movie();
+			movie.setTitle(movieDTO.getTitle());
+			movie.setYear(movieDTO.getYear());
+			movie.setYear(movieDTO.getYear());
+			for(String genre : movieDTO.getGenres()) {
+				movie.getGenres().add(em.find(Genre.class, genre));
+			}
+			em.persist(movie);
+			em.getTransaction().commit();
+			em.close();
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+			em.close();
+			e.printStackTrace();
+		}
 	}
 
 	/**
@@ -55,7 +72,18 @@ public class MovieManager {
 	 * @throws Exception Beschreibt evtl. aufgetretenen Fehler
 	 */
 	public void deleteMovie(int movieId) throws Exception {
-		/* TODO */
+		EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager();
+		try {
+			em.getTransaction().begin();
+			Movie movie = em.find(Movie.class, movieId);
+			em.remove(movie);
+			em.getTransaction().commit();
+			em.close();
+		} catch(Exception e){
+			em.getTransaction().rollback();
+			em.close();
+			e.printStackTrace();
+		}
 	}
 
 	/**
