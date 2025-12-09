@@ -1,4 +1,4 @@
-package de.hsh.inform.dbs2.gui;
+package de.hsh.dbs2.imdb.gui;
 
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;

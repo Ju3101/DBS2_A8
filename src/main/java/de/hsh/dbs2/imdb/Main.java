@@ -1,20 +1,31 @@
-package de.hsh.inform.dbs2;
+package de.hsh.dbs2.imdb;
 
-import de.hsh.inform.dbs2.entities.Genre;
-import de.hsh.inform.dbs2.entities.Movie;
-import de.hsh.inform.dbs2.entities.MovieCharacter;
-import de.hsh.inform.dbs2.entities.Person;
-import de.hsh.inform.dbs2.util.EMFSingleton;
+import de.hsh.dbs2.imdb.entities.Genre;
+import de.hsh.dbs2.imdb.entities.Movie;
+import de.hsh.dbs2.imdb.entities.MovieCharacter;
+import de.hsh.dbs2.imdb.entities.Person;
+import de.hsh.dbs2.imdb.gui.SearchMovieDialog;
+import de.hsh.dbs2.imdb.gui.SearchMovieDialogCallback;
+import de.hsh.dbs2.imdb.util.EMFSingleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
-import java.util.*;
+
+import javax.swing.*;
 
 import java.util.List;
 
 public class Main {
 
     public static void main(String [] args) {
-        createMovieWithGenreAndMovieCharacters();
+        SwingUtilities.invokeLater(() -> {
+            new Main().run();
+        });
+    }
+
+    public void run() {
+        SearchMovieDialogCallback smdc = new SearchMovieDialogCallback();
+        SearchMovieDialog smd = new SearchMovieDialog(smdc);
+        smd.setVisible(true);
     }
 
     public static void createMovieWithGenreAndMovieCharacters() {

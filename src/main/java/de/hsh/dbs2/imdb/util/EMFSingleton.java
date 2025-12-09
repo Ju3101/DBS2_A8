@@ -1,4 +1,4 @@
-package de.hsh.inform.dbs2.util;
+package de.hsh.dbs2.imdb.util;
 
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;

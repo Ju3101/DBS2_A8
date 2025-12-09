@@ -1,4 +1,4 @@
-package de.hsh.inform.dbs2.entities;
+package de.hsh.dbs2.imdb.entities;
 
 import jakarta.persistence.*;
 
