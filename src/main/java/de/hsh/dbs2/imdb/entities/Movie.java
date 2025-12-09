@@ -18,10 +18,10 @@ public class Movie {
 
     private int year;
 
-    @ManyToMany(mappedBy = "movies", cascade = CascadeType.PERSIST)
+    @ManyToMany(mappedBy = "movies", cascade = CascadeType.MERGE)
     private Set<Genre> genres = new HashSet<>();
 
-    @OneToMany (mappedBy = "movie", cascade = CascadeType.PERSIST)
+    @OneToMany (mappedBy = "movie", cascade = CascadeType.MERGE)
     private Set<MovieCharacter> movieCharacters = new HashSet<>();
 
     public Movie(String title, String type, int year) {

@@ -72,13 +72,14 @@ public class MovieManager {
 		try {
 			em.getTransaction().begin();
 
-			Movie movie = em.find(Movie.class, movieDTO.getId());
-			// Falls Movie in der Datenbank existiert, hole das Objekt aus der Datenbank.
-			if(movieDTO.getId() != null) {
+			Movie movie = movieDTO.getId() != null ? em.find(Movie.class, movieDTO.getId()) : null;
+
+			// Falls Movie schon existiert, verwende managed Objekt von EntityManager.
+			if (movie != null) {
 				createMovie(movie, movieDTO, em);
 				em.flush();
 			} else {
-				// Initialisiere nicht-managed, neues Movie-Objekt.
+				// Ansonsten: Erstelle neues Movie-Objekt.
 				movie = new Movie();
 				createMovie(movie, movieDTO, em);
 				em.persist(movie);
@@ -102,22 +103,23 @@ public class MovieManager {
 		//Übernahme der Genres
 		movie.getGenres().clear();
 
-		TypedQuery<Genre> query1 = em.createQuery("SELECT g  FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
+		TypedQuery<Genre> genreQuery = em.createQuery("SELECT g  FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
 		Set<String> genreName = movieDTO.getGenres();
-		query1.setParameter("genreParam", genreName);
-		movie.getGenres().addAll(query1.getResultList());
+		genreQuery.setParameter("genreParam", genreName);
+		movie.getGenres().addAll(genreQuery.getResultList());
 
 
 		//Übernahme der Charactere
 		movie.getMovieCharacters().clear();
 
-		TypedQuery<Person> query2 = em.createQuery("SELECT p  FROM Person p WHERE p.name Like :personParam", Person.class);
+		TypedQuery<Person> personQuery = em.createQuery("SELECT p  FROM Person p WHERE p.name = :personParam", Person.class);
+
 		List<CharacterDTO> movieCharacters = movieDTO.getCharacters();
-		for(int i = 0; i < movieCharacters.size(); i++) {
+		for (int i = 0; i < movieCharacters.size(); i++) {
 			CharacterDTO characterDTO = movieCharacters.get(i);
-			query2.setParameter("personParam",characterDTO.getCharacter());
+			personQuery.setParameter("personParam", characterDTO.getPlayer());
 			MovieCharacter movieCharacter = new MovieCharacter(characterDTO.getCharacter(), characterDTO.getAlias(), i);
-			movieCharacter.setActor(query2.getSingleResult());
+			movieCharacter.setActor(personQuery.getSingleResult());
 			movieCharacter.setMovie(movie);
 			movie.getMovieCharacters().add(movieCharacter);
 		}
