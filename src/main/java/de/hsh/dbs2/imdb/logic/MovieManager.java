@@ -109,24 +109,28 @@ public class MovieManager {
 
 
 		//Übernahme der Charactere
-		movie.getMovieCharacters().clear();
-
-		TypedQuery<Person> personQuery = em.createQuery("SELECT p  FROM Person p WHERE p.name = :personParam", Person.class);
-
+		Set<MovieCharacter> originalCharacters = movie.getMovieCharacters();
 		List<CharacterDTO> movieCharacters = movieDTO.getCharacters();
-		for (int i = 0; i < movieCharacters.size(); i++) {
-			CharacterDTO characterDTO = movieCharacters.get(i);
-			personQuery.setParameter("personParam", characterDTO.getPlayer());
-			MovieCharacter movieCharacter = new MovieCharacter(characterDTO.getCharacter(), characterDTO.getAlias(), i);
-			movieCharacter.setActor(personQuery.getSingleResult());
-			movieCharacter.setMovie(movie);
-			movie.getMovieCharacters().add(movieCharacter);
+		for (MovieCharacter movieCharacter : originalCharacters) {
+			for (CharacterDTO characterDTO : movieCharacters) {
+				if(movieCharacter.getCharacter().equals(characterDTO.getCharacter())
+						&& movieCharacter.getAlias().equals(characterDTO.getAlias())
+						&& movieCharacter.getActor().getName().equals(characterDTO.getPlayer())) {
+					continue;
+				} else {
+					originalCharacters.add(createMovieCharacter(characterDTO, movie, em, originalCharacters.size()+1));
+				}
+			}
 		}
-
 	}
 
-	private static Set<MovieCharacter> getMovieCharacters(Movie movie) {
-		return movie.getMovieCharacters();
+	private static MovieCharacter createMovieCharacter(CharacterDTO characterDTO, Movie movie, EntityManager em, int pos) throws Exception { em
+		TypedQuery<Person> personQuery = em.createQuery("SELECT p  FROM Person p WHERE p.name = :personParam", Person.class);
+		personQuery.setParameter("personParam", characterDTO.getPlayer());
+		MovieCharacter movieCharacter = new MovieCharacter(characterDTO.getCharacter(), characterDTO.getAlias(), pos);
+		movieCharacter.setActor(personQuery.getSingleResult());
+		movieCharacter.setMovie(movie);
+		return movieCharacter;
 	}
 
 	/**
