@@ -21,7 +21,8 @@ public class PersonManager {
 				boolean hasSearch = name != null && !name.isEmpty();
 				if (hasSearch) {
 					return em.createQuery(
-							"SELECT p.name FROM Person AS p WHERE p.name LIKE :name", String.class
+							"SELECT p.name FROM Person AS p WHERE p.name LIKE :name",
+							String.class
 					).setParameter("name", "%" + name + "%").getResultList();
 				} else {
 					return em.createQuery("SELECT p.name FROM Person AS p", String.class).getResultList();
@@ -42,7 +43,21 @@ public class PersonManager {
 	 * @throws Exception Beschreibt evtl. aufgetretenen Fehler
 	 */
 	public int getPerson(String name) throws Exception {
-		/* TODO */
-		return -1;
+		if (name == null || name.isEmpty()) {
+			throw new IllegalArgumentException("Name darf nicht leer sein");
+		}
+
+		try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
+
+			try {
+				em.getTransaction().begin();
+				return em.createQuery("SELECT p.id FROM Person AS p WHERE p.name = :name", Integer.class)
+						.setParameter("name", name).getSingleResult();
+			} catch (Exception e) {
+				em.getTransaction().rollback();
+				throw e;
+			}
+
+		}
 	}
 }
