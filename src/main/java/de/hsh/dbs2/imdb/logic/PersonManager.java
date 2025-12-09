@@ -18,15 +18,21 @@ public class PersonManager {
 
 			try {
 				em.getTransaction().begin();
+
 				boolean hasSearch = name != null && !name.isEmpty();
+				List<String> result;
 				if (hasSearch) {
-					return em.createQuery(
+					result = em.createQuery(
 							"SELECT p.name FROM Person AS p WHERE p.name LIKE :name",
 							String.class
 					).setParameter("name", "%" + name + "%").getResultList();
 				} else {
-					return em.createQuery("SELECT p.name FROM Person AS p", String.class).getResultList();
+					result = em.createQuery("SELECT p.name FROM Person AS p", String.class).getResultList();
 				}
+
+				em.getTransaction().commit();
+				return result;
+
 			} catch (Exception e) {
 				em.getTransaction().rollback();
 				throw e;
@@ -49,10 +55,13 @@ public class PersonManager {
 
 		try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
 
+			int result;
 			try {
 				em.getTransaction().begin();
-				return em.createQuery("SELECT p.id FROM Person AS p WHERE p.name = :name", Integer.class)
+				result = em.createQuery("SELECT p.id FROM Person AS p WHERE p.name = :name", Integer.class)
 						.setParameter("name", name).getSingleResult();
+				em.getTransaction().commit();
+				return result;
 			} catch (Exception e) {
 				em.getTransaction().rollback();
 				throw e;
