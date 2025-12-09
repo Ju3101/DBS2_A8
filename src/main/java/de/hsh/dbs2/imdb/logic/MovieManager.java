@@ -96,40 +96,31 @@ public class MovieManager {
 	public MovieDTO getMovie(int movieId) throws Exception {
 
         try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
-            em.getTransaction().begin();
+            try {
+                em.getTransaction().begin();
+                MovieDTO dto = new MovieDTO();
+                Movie movie = (Movie) em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId").getSingleResult();
+                dto.setId(movie.getId());
+                dto.setTitle(movie.getTitle());
+                dto.setType(movie.getType());
+                Set<String> genreStrings = new HashSet<>();
+                for (Genre g : movie.getGenres()) {
+                    genreStrings.add(g.getGenre());
+                }
+                dto.setGenres(genreStrings);
+                List<CharacterDTO> characterDTOs = new ArrayList<>();
+                for (MovieCharacter mc : movie.getMovieCharacters()) {
+                    characterDTOs.add(new CharacterDTO(mc.getCharacter(), mc.getAlias(), mc.getActor().getName()));
+                }
+                dto.setCharacters(characterDTOs);
+                em.getTransaction().commit();
 
-            MovieDTO dto = new MovieDTO();
-            Movie movie = (Movie) em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId").getSingleResult();
-            dto.setId(movie.getId());
-            dto.setTitle(movie.getTitle());
-            dto.setType(movie.getType());
-            Set<String> dtoGenres = new HashSet<>();
-            //Genre-Strings aus Genre-Objekten extrahieren
-            for (Genre g : movie.getGenres()) {
-                dtoGenres.add(g.getGenre());
+            } catch (Exception e) {
+                e.printStackTrace();
+                em.getTransaction().rollback();
             }
-            dto.setGenres(dtoGenres);
-            List<MovieCharacter> movieCharacters = em.createQuery("SELECT mc FROM MovieCharacter AS mc WHERE mc.movie.id = :movieId")
-                    .getResultList();
-            List<CharacterDTO> charDTOs = new ArrayList<>();
-            for (MovieCharacter mc : movieCharacters) {
-
-            }
-
         }
-
 		return null;
 	}
 
-    private CharacterDTO createCharacterDTO() {
-
-        try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
-            em.getTransaction().begin();
-
-            CharacterDTO charDto = new CharacterDTO();
-
-        }
-
-        return null;
-    }
 }
