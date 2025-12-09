@@ -12,6 +12,7 @@ import de.hsh.dbs2.imdb.logic.dto.CharacterDTO;
 import de.hsh.dbs2.imdb.logic.dto.MovieDTO;
 import de.hsh.dbs2.imdb.util.EMFSingleton;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 
 public class MovieManager {
 
@@ -51,10 +52,13 @@ public class MovieManager {
 			Movie movie = new Movie();
 			movie.setTitle(movieDTO.getTitle());
 			movie.setYear(movieDTO.getYear());
-			movie.setYear(movieDTO.getYear());
-			for(String genre : movieDTO.getGenres()) {
-				movie.getGenres().add(em.find(Genre.class, genre));
-			}
+			movie.setType(movieDTO.getType());
+
+			TypedQuery<Genre> query = em.createQuery("SELECT g  FROM Genre g WHERE g.genre = :genreParam", Genre.class);
+			Set<String> genreName = movieDTO.getGenres();
+			query.setParameter("genreParam", genreName);
+			movie.getGenres().addAll(query.getResultList());
+
 			em.persist(movie);
 			em.getTransaction().commit();
 			em.close();
