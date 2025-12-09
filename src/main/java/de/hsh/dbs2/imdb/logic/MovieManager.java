@@ -27,13 +27,34 @@ public class MovieManager {
 	public List<MovieDTO> getMovieList(String search) throws Exception {
 
         try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
-            em.getTransaction().begin();
-            HashSet<MovieDTO> dtos = new HashSet<>();
-            List<Movie> movies = em.createQuery("SELECT m FROM Movie AS m WHERE m.title LIKE :search").getResultList();
+
+			try {
+				em.getTransaction().begin();
+
+				// Ergebnisliste.
+				ArrayList<MovieDTO> dtos = new ArrayList<>();
+
+				// Alle IDs von passenden Filmen holen.
+				List<Integer> movieIds = em.createQuery(
+						"SELECT m.id FROM Movie AS m WHERE m.title LIKE :search",
+						Integer.class
+				).setParameter("search", search).getResultList();
+
+				for (Integer movieId : movieIds) {
+					dtos.add(getMovie(movieId));
+				}
+
+				em.getTransaction().commit();
+				return dtos;
+
+			} catch (Exception e) {
+				e.printStackTrace();
+				em.getTransaction().rollback();
+				throw e;
+			}
 
         }
 
-		return null;
 	}
 
 	/**
