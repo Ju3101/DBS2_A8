@@ -10,7 +10,7 @@ import java.util.Set;
 public class Movie {
 
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    private int id;
 
     private String title;
 
@@ -38,8 +38,12 @@ public class Movie {
         return title;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
+    }
+
+    public String getType() {
+        return type;
     }
 
     public Set<Genre> getGenres() {

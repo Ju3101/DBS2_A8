@@ -1,8 +1,17 @@
 package de.hsh.dbs2.imdb.logic;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import de.hsh.dbs2.imdb.entities.Genre;
+import de.hsh.dbs2.imdb.entities.Movie;
+import de.hsh.dbs2.imdb.entities.MovieCharacter;
+import de.hsh.dbs2.imdb.logic.dto.CharacterDTO;
 import de.hsh.dbs2.imdb.logic.dto.MovieDTO;
+import de.hsh.dbs2.imdb.util.EMFSingleton;
+import jakarta.persistence.EntityManager;
 
 public class MovieManager {
 
@@ -15,7 +24,14 @@ public class MovieManager {
 	 * @throws Exception Beschreibt evtl. aufgetretenen Fehler
 	 */
 	public List<MovieDTO> getMovieList(String search) throws Exception {
-		/* TODO */
+
+        try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
+            em.getTransaction().begin();
+            HashSet<MovieDTO> dtos = new HashSet<>();
+            List<Movie> movies = em.createQuery("SELECT m FROM Movie AS m WHERE m.title LIKE :search").getResultList();
+
+        }
+
 		return null;
 	}
 
@@ -50,8 +66,42 @@ public class MovieManager {
 	 * @throws Exception Z.B. bei Datenbank-Fehlern oder falls der Movie nicht existiert.
 	 */
 	public MovieDTO getMovie(int movieId) throws Exception {
-		/* TODO */
+
+        try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
+            em.getTransaction().begin();
+
+            MovieDTO dto = new MovieDTO();
+            Movie movie = (Movie) em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId").getSingleResult();
+            dto.setId(movie.getId());
+            dto.setTitle(movie.getTitle());
+            dto.setType(movie.getType());
+            Set<String> dtoGenres = new HashSet<>();
+            //Genre-Strings aus Genre-Objekten extrahieren
+            for (Genre g : movie.getGenres()) {
+                dtoGenres.add(g.getGenre());
+            }
+            dto.setGenres(dtoGenres);
+            List<MovieCharacter> movieCharacters = em.createQuery("SELECT mc FROM MovieCharacter AS mc WHERE mc.movie.id = :movieId")
+                    .getResultList();
+            List<CharacterDTO> charDTOs = new ArrayList<>();
+            for (MovieCharacter mc : movieCharacters) {
+
+            }
+
+        }
+
 		return null;
 	}
-	
+
+    private CharacterDTO createCharacterDTO() {
+
+        try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
+            em.getTransaction().begin();
+
+            CharacterDTO charDto = new CharacterDTO();
+
+        }
+
+        return null;
+    }
 }

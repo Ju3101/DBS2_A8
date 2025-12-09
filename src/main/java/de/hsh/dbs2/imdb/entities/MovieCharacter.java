@@ -56,4 +56,8 @@ public class MovieCharacter {
     public Person getActor() {
         return actor;
     }
+
+    public Movie getMovie() {
+        return movie;
+    }
 }

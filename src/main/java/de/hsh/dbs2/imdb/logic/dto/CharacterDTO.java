@@ -11,6 +11,12 @@ public class CharacterDTO {
 	
 	public CharacterDTO() {
 	}
+
+    public CharacterDTO(String character, String alias, String player) {
+        this.character = character;
+        this.alias = alias;
+        this.player = player;
+    }
 	
 	public String getCharacter() {
 		return character;

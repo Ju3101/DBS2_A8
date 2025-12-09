@@ -27,14 +27,9 @@ public class GenreManager {
                 e.printStackTrace();
                 em.getTransaction().rollback();
             }
-
         } catch (Exception e) {
             e.printStackTrace();
-
         }
-
 		return null;
 	}
-
-
 }
