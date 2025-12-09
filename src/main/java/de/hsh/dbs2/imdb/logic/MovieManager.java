@@ -77,7 +77,6 @@ public class MovieManager {
 			// Falls Movie schon existiert, verwende managed Objekt von EntityManager.
 			if (movie != null) {
 				createMovie(movie, movieDTO, em);
-				em.flush();
 			} else {
 				// Ansonsten: Erstelle neues Movie-Objekt.
 				movie = new Movie();
@@ -123,6 +122,11 @@ public class MovieManager {
 			movieCharacter.setMovie(movie);
 			movie.getMovieCharacters().add(movieCharacter);
 		}
+
+	}
+
+	private static Set<MovieCharacter> getMovieCharacters(Movie movie) {
+		return movie.getMovieCharacters();
 	}
 
 	/**

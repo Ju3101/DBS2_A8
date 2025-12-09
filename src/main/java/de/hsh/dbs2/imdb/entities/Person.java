@@ -15,7 +15,7 @@ public class Person {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "actor", cascade = CascadeType.MERGE)
+    @OneToMany(mappedBy = "actor", cascade = CascadeType.PERSIST)
     private Set<MovieCharacter> movieCharacters = new HashSet<>();
 
     public Person() {}
