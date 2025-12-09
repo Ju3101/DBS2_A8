@@ -1,5 +1,8 @@
 package de.hsh.dbs2.imdb.logic;
 
+import de.hsh.dbs2.imdb.util.EMFSingleton;
+import jakarta.persistence.EntityManager;
+
 import java.util.List;
 
 public class PersonManager {
@@ -11,8 +14,24 @@ public class PersonManager {
 	 * @throws Exception Beschreibt evtl. aufgetretenen Fehler
 	 */
 	public List<String> getPersonList(String name) throws Exception {
-		/* TODO */
-		return null;
+		try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
+
+			try {
+				em.getTransaction().begin();
+				boolean hasSearch = name != null && !name.isEmpty();
+				if (hasSearch) {
+					return em.createQuery(
+							"SELECT p.name FROM Person AS p WHERE p.name LIKE :name", String.class
+					).setParameter("name", "%" + name + "%").getResultList();
+				} else {
+					return em.createQuery("SELECT p.name FROM Person AS p", String.class).getResultList();
+				}
+			} catch (Exception e) {
+				em.getTransaction().rollback();
+				throw e;
+			}
+
+		}
 	}
 
 	/**
