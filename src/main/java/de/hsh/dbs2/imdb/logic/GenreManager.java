@@ -1,9 +1,5 @@
 package de.hsh.dbs2.imdb.logic;
 
-import DBS2.Aufgabe6.Entity.Genre;
-import DBS2.Aufgabe6.Entity.GenreFactory;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class GenreManager {
@@ -15,13 +11,9 @@ public class GenreManager {
 	 * @throws Exception error describing e.g. the database problem
 	 */
 	public List<String> getGenres() throws Exception {
-        ArrayList<String> genreStrs = new ArrayList<>();
-
-        List<Genre> genres = GenreFactory.findAll();
-        for (Genre genre : genres) {
-            genreStrs.add(genre.getGenre());
-        }
-
-        return genreStrs;
+		/* TODO */
+		return null;
 	}
+
+
 }
