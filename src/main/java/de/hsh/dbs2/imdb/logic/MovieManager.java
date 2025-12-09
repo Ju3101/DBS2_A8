@@ -36,9 +36,9 @@ public class MovieManager {
 
 				// Alle IDs von passenden Filmen holen.
 				List<Integer> movieIds = em.createQuery(
-						"SELECT m.id FROM Movie AS m WHERE m.title LIKE :search",
+						"SELECT m.id FROM Movie AS m WHERE LOWER(m.title) LIKE :search",
 						Integer.class
-				).setParameter("search", "%" + search + "%").getResultList();
+				).setParameter("search", "%" + search.toLowerCase() + "%").getResultList();
 
 				for (Integer movieId : movieIds) {
 					dtos.add(getMovie(movieId));
