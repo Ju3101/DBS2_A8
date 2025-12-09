@@ -72,7 +72,18 @@ public class MovieManager {
 	 * @throws Exception Beschreibt evtl. aufgetretenen Fehler
 	 */
 	public void deleteMovie(int movieId) throws Exception {
-		/* TODO */
+		EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager();
+		try {
+			em.getTransaction().begin();
+			Movie movie = em.find(Movie.class, movieId);
+			em.remove(movie);
+			em.getTransaction().commit();
+			em.close();
+		} catch(Exception e){
+			em.getTransaction().rollback();
+			em.close();
+			e.printStackTrace();
+		}
 	}
 
 	/**
