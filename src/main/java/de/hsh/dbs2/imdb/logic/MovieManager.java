@@ -75,12 +75,20 @@ public class MovieManager {
 			movie.setYear(movieDTO.getYear());
 			movie.setType(movieDTO.getType());
 
-			TypedQuery<Genre> query = em.createQuery("SELECT g  FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
+			//Genres hinzufügen
+			TypedQuery<Genre> query1 = em.createQuery("SELECT g  FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
 			Set<String> genreName = movieDTO.getGenres();
-			query.setParameter("genreParam", genreName);
-			movie.getGenres().addAll(query.getResultList());
+			query1.setParameter("genreParam", genreName);
+			movie.getGenres().addAll(query1.getResultList());
 
-			em.persist(movie);
+			//Characters hinzufügen
+			TypedQuery<MovieCharacter> query2 = em.createQuery("SELECT c FROM MovieCharacter c WHERE c.character = :characterParam", MovieCharacter.class);
+			List<CharacterDTO> movieCharacters = movieDTO.getCharacters();
+			for(CharacterDTO characterDTO : movieCharacters) {
+				movie.getMovieCharacters().add(query2.setParameter("characterParam", characterDTO.getCharacter()).getSingleResult());
+			}
+
+			em.merge(movie);
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
