@@ -38,7 +38,7 @@ public class MovieManager {
 				List<Integer> movieIds = em.createQuery(
 						"SELECT m.id FROM Movie AS m WHERE m.title LIKE :search",
 						Integer.class
-				).setParameter("search", search).getResultList();
+				).setParameter("search", "%" + search + "%").getResultList();
 
 				for (Integer movieId : movieIds) {
 					dtos.add(getMovie(movieId));
@@ -146,6 +146,7 @@ public class MovieManager {
                 }
                 dto.setCharacters(characterDTOs);
                 em.getTransaction().commit();
+				return dto;
 
             } catch (Exception e) {
                 e.printStackTrace();
