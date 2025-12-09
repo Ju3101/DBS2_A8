@@ -6,6 +6,7 @@ import de.hsh.dbs2.imdb.entities.MovieCharacter;
 import de.hsh.dbs2.imdb.entities.Person;
 import de.hsh.dbs2.imdb.gui.SearchMovieDialog;
 import de.hsh.dbs2.imdb.gui.SearchMovieDialogCallback;
+import de.hsh.dbs2.imdb.logic.GenreManager;
 import de.hsh.dbs2.imdb.util.EMFSingleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -20,6 +21,14 @@ public class Main {
         SwingUtilities.invokeLater(() -> {
             new Main().run();
         });
+        GenreManager gm = new GenreManager();
+
+        try {
+            gm.getGenres();
+        } catch (Exception e) {
+
+        }
+
     }
 
     public void run() {
