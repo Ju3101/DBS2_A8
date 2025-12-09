@@ -107,7 +107,10 @@ public class MovieManager {
             try {
                 em.getTransaction().begin();
                 MovieDTO dto = new MovieDTO();
-                Movie movie = (Movie) em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId").getSingleResult();
+                TypedQuery<Movie> tq = em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId", Movie.class);
+                tq.setParameter("movieId", movieId);
+                Movie movie = tq.getSingleResult();
+
                 dto.setId(movie.getId());
                 dto.setTitle(movie.getTitle());
                 dto.setType(movie.getType());
