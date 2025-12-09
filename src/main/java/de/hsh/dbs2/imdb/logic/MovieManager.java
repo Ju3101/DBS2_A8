@@ -10,6 +10,7 @@ import de.hsh.dbs2.imdb.entities.Movie;
 import de.hsh.dbs2.imdb.entities.MovieCharacter;
 import de.hsh.dbs2.imdb.logic.dto.CharacterDTO;
 import de.hsh.dbs2.imdb.logic.dto.MovieDTO;
+import de.hsh.dbs2.imdb.persistence.DoesNotExistException;
 import de.hsh.dbs2.imdb.util.EMFSingleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
@@ -42,6 +43,7 @@ public class MovieManager {
 
 				for (Integer movieId : movieIds) {
 					dtos.add(getMovie(movieId));
+                    System.out.println(dtos.getLast());
 				}
 
 				em.getTransaction().commit();
@@ -52,9 +54,7 @@ public class MovieManager {
 				em.getTransaction().rollback();
 				throw e;
 			}
-
         }
-
 	}
 
 	/**
@@ -135,33 +135,41 @@ public class MovieManager {
         try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
             try {
                 em.getTransaction().begin();
+                //Neues MovieDTO definieren und Movie-Objekt, anhand des Parameters movieId aus der DB abfragen.
                 MovieDTO dto = new MovieDTO();
                 TypedQuery<Movie> tq = em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId", Movie.class);
                 tq.setParameter("movieId", movieId);
                 Movie movie = tq.getSingleResult();
 
+                //Erste Parameter des MovieDTOs mithilfe des Movie-Objektes setzen.
                 dto.setId(movie.getId());
                 dto.setTitle(movie.getTitle());
                 dto.setType(movie.getType());
+
+                //Liste an Genre-Namen (Strings) per Schleife mithilfe des Set<Genre> vom Movie-Objekt befüllen,
+                //weil das MovieDTO-Objekt die Genres nur in Form einer String-Collection speichert
                 Set<String> genreStrings = new HashSet<>();
                 for (Genre g : movie.getGenres()) {
                     genreStrings.add(g.getGenre());
                 }
                 dto.setGenres(genreStrings);
+
+                //CharacterDTO-Liste erstellen und mithilfe der MovieCharacter-Collection des Movie-Objektes befüllen
                 List<CharacterDTO> characterDTOs = new ArrayList<>();
                 for (MovieCharacter mc : movie.getMovieCharacters()) {
                     characterDTOs.add(new CharacterDTO(mc.getCharacter(), mc.getAlias(), mc.getActor().getName()));
                 }
                 dto.setCharacters(characterDTOs);
+
                 em.getTransaction().commit();
 				return dto;
 
             } catch (Exception e) {
                 e.printStackTrace();
                 em.getTransaction().rollback();
+                throw new DoesNotExistException("Could not find movie by Id: " + movieId);
             }
         }
-		return null;
 	}
 
 }
