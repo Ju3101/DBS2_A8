@@ -8,6 +8,7 @@ import java.util.Set;
 import de.hsh.dbs2.imdb.entities.Genre;
 import de.hsh.dbs2.imdb.entities.Movie;
 import de.hsh.dbs2.imdb.entities.MovieCharacter;
+import de.hsh.dbs2.imdb.entities.Person;
 import de.hsh.dbs2.imdb.logic.dto.CharacterDTO;
 import de.hsh.dbs2.imdb.logic.dto.MovieDTO;
 import de.hsh.dbs2.imdb.persistence.DoesNotExistException;
@@ -71,38 +72,54 @@ public class MovieManager {
 		try {
 			em.getTransaction().begin();
 
-			Movie movie;
+			Movie movie = em.find(Movie.class, movieDTO.getId());
 			// Falls Movie in der Datenbank existiert, hole das Objekt aus der Datenbank.
 			if(movieDTO.getId() != null) {
-				movie = em.find(Movie.class, movieDTO.getId());
+				createMovie(movie, movieDTO, em);
+				em.flush();
 			} else {
 				// Initialisiere nicht-managed, neues Movie-Objekt.
 				movie = new Movie();
-				movie.setTitle(movieDTO.getTitle());
-				movie.setYear(movieDTO.getYear());
-				movie.setType(movieDTO.getType());
+				createMovie(movie, movieDTO, em);
+				em.persist(movie);
 			}
-
-			//Genres hinzufügen
-			TypedQuery<Genre> query1 = em.createQuery("SELECT g  FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
-			Set<String> genreName = movieDTO.getGenres();
-			query1.setParameter("genreParam", genreName);
-			movie.getGenres().addAll(query1.getResultList());
-
-			//Characters hinzufügen
-			TypedQuery<MovieCharacter> query2 = em.createQuery("SELECT c FROM MovieCharacter c WHERE c.character = :characterParam", MovieCharacter.class);
-			List<CharacterDTO> movieCharacters = movieDTO.getCharacters();
-			for(CharacterDTO characterDTO : movieCharacters) {
-				movie.getMovieCharacters().add(query2.setParameter("characterParam", characterDTO.getCharacter()).getSingleResult());
-			}
-
-			em.merge(movie);
 			em.getTransaction().commit();
 			em.close();
 		} catch (Exception e) {
 			em.getTransaction().rollback();
 			em.close();
 			e.printStackTrace();
+			throw e;
+		}
+	}
+
+	private void createMovie(Movie movie, MovieDTO movieDTO, EntityManager em) throws Exception {
+		//Einstellen der eifnachen Attribute
+		movie.setTitle(movieDTO.getTitle());
+		movie.setYear(movieDTO.getYear());
+		movie.setType(movieDTO.getType());
+
+		//Übernahme der Genres
+		movie.getGenres().clear();
+
+		TypedQuery<Genre> query1 = em.createQuery("SELECT g  FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
+		Set<String> genreName = movieDTO.getGenres();
+		query1.setParameter("genreParam", genreName);
+		movie.getGenres().addAll(query1.getResultList());
+
+
+		//Übernahme der Charactere
+		movie.getMovieCharacters().clear();
+
+		TypedQuery<Person> query2 = em.createQuery("SELECT p  FROM Person p WHERE p.name Like :personParam", Person.class);
+		List<CharacterDTO> movieCharacters = movieDTO.getCharacters();
+		for(int i = 0; i < movieCharacters.size(); i++) {
+			CharacterDTO characterDTO = movieCharacters.get(i);
+			query2.setParameter("personParam",characterDTO.getCharacter());
+			MovieCharacter movieCharacter = new MovieCharacter(characterDTO.getCharacter(), characterDTO.getAlias(), i);
+			movieCharacter.setActor(query2.getSingleResult());
+			movieCharacter.setMovie(movie);
+			movie.getMovieCharacters().add(movieCharacter);
 		}
 	}
 
@@ -116,9 +133,9 @@ public class MovieManager {
 		EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager();
 		try {
 			em.getTransaction().begin();
-			Movie movie = em.find(Movie.class, movieId);
+			Movie movie = em.find(Movie.class, movieId);	//versucht Film zu finden, find gibt entweder null oder den Movie zurück
 
-			if(movie != null) {
+			if(movie != null) {		//überprüft, ob movie gefunden werden konnte, wenn ja wird er gelöscht
 				em.remove(movie);
 			}
 
@@ -128,6 +145,7 @@ public class MovieManager {
 			em.getTransaction().rollback();
 			em.close();
 			e.printStackTrace();
+			throw e;
 		}
 	}
 
