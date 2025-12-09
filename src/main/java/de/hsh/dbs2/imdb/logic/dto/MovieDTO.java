@@ -20,7 +20,7 @@ public class MovieDTO {
 	private String type = "C";
 	private int year = 0;
 	private Set<String> genres = new HashSet<>();
-	private final List<CharacterDTO> characters = new ArrayList<>();
+	private List<CharacterDTO> characters = new ArrayList<>();
 	
 	public Integer getId() {
 		return id;
@@ -63,6 +63,9 @@ public class MovieDTO {
 	public void setGenres(Set<String> genres2) {
 		this.genres = genres2;
 	}
+    public void setCharacters(List<CharacterDTO> characters) {
+        this.characters = characters;
+    }
 
     @Override
     public String toString() {
