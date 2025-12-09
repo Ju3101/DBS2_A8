@@ -70,10 +70,18 @@ public class MovieManager {
 		EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager();
 		try {
 			em.getTransaction().begin();
-			Movie movie = new Movie();
-			movie.setTitle(movieDTO.getTitle());
-			movie.setYear(movieDTO.getYear());
-			movie.setType(movieDTO.getType());
+
+			Movie movie;
+			// Falls Movie in der Datenbank existiert, hole das Objekt aus der Datenbank.
+			if(movieDTO.getId() != null) {
+				movie = em.find(Movie.class, movieDTO.getId());
+			} else {
+				// Initialisiere nicht-managed, neues Movie-Objekt.
+				movie = new Movie();
+				movie.setTitle(movieDTO.getTitle());
+				movie.setYear(movieDTO.getYear());
+				movie.setType(movieDTO.getType());
+			}
 
 			//Genres hinzufügen
 			TypedQuery<Genre> query1 = em.createQuery("SELECT g  FROM Genre g WHERE g.genre IN :genreParam", Genre.class);

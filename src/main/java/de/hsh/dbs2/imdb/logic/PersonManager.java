@@ -22,11 +22,13 @@ public class PersonManager {
 				boolean hasSearch = name != null && !name.isEmpty();
 				List<String> result;
 				if (hasSearch) {
+					// Frage Liste von Namen ab, die den Suchstring enthalten.
 					result = em.createQuery(
 							"SELECT p.name FROM Person AS p WHERE p.name LIKE :name",
 							String.class
 					).setParameter("name", "%" + name + "%").getResultList();
 				} else {
+					// Frage ungefilterte Liste von Namen ab.
 					result = em.createQuery("SELECT p.name FROM Person AS p", String.class).getResultList();
 				}
 
@@ -49,6 +51,7 @@ public class PersonManager {
 	 * @throws Exception Beschreibt evtl. aufgetretenen Fehler
 	 */
 	public int getPerson(String name) throws Exception {
+		// Die Person kann nur gesucht werden, wenn ein Name angegeben ist.
 		if (name == null || name.isEmpty()) {
 			throw new IllegalArgumentException("Name darf nicht leer sein");
 		}
@@ -58,8 +61,11 @@ public class PersonManager {
 			int result;
 			try {
 				em.getTransaction().begin();
+
+				// Frage die ID der Person ab, deren Name genau dem Suchstring entspricht.
 				result = em.createQuery("SELECT p.id FROM Person AS p WHERE p.name = :name", Integer.class)
 						.setParameter("name", name).getSingleResult();
+
 				em.getTransaction().commit();
 				return result;
 			} catch (Exception e) {
