@@ -1,6 +1,9 @@
 package de.hsh.inform.dbs2;
 
+import de.hsh.inform.dbs2.entities.Genre;
 import de.hsh.inform.dbs2.entities.Movie;
+import de.hsh.inform.dbs2.entities.MovieCharacter;
+import de.hsh.inform.dbs2.entities.Person;
 import de.hsh.inform.dbs2.util.EMFSingleton;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
@@ -11,8 +14,39 @@ import java.util.List;
 public class Main {
 
     public static void main(String [] args) {
-        createMovie();
-        printMovies();
+        createMovieWithGenreAndMovieCharacters();
+    }
+
+    public static void createMovieWithGenreAndMovieCharacters() {
+        try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
+            try {
+
+                em.getTransaction().begin();
+
+                Movie movie = new Movie("Star Wars IV", "C", 1977);
+                MovieCharacter mc = new MovieCharacter("Han-Solo", "Han", 2);
+                Genre genre = new Genre("Sci-Fi");
+                Person actor = new Person("Harrison Ford");
+
+                movie.addMovieCharacter(mc);
+                movie.addGenre(genre);
+                genre.addMovie(movie);
+                mc.setMovie(movie);
+                mc.setActor(actor);
+                actor.addMovieCharacter(mc);
+
+                em.persist(movie);
+                em.persist(actor);
+                em.persist(mc);
+
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                e.printStackTrace();
+                em.getTransaction().rollback();
+            }
+        }
+
+
     }
 
     public static void createMovie() {
@@ -28,6 +62,24 @@ public class Main {
                     trx.rollback();
                 }
                 throw ex;
+            }
+        }
+    }
+
+    public static void createMovieCharacter() {
+
+        try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
+            try {
+                em.getTransaction().begin();
+
+                MovieCharacter mc = new MovieCharacter("Darth Vader", "test", 1);
+                em.persist(mc);
+                em.getTransaction().commit();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                em.getTransaction().rollback();
+                throw e;
             }
         }
     }

@@ -21,6 +21,9 @@ public class Movie {
     @ManyToMany(mappedBy = "movies", cascade = CascadeType.PERSIST)
     private Set<Genre> genres = new HashSet<>();
 
+    @OneToMany (mappedBy = "movie", cascade = CascadeType.PERSIST)
+    private Set<MovieCharacter> movieCharacters = new HashSet<>();
+
     public Movie(String title, String type, int year) {
         this.title = title;
         this.type = type;
@@ -41,5 +44,21 @@ public class Movie {
 
     public Set<Genre> getGenres() {
         return genres;
+    }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
+
+    public void addMovieCharacter(MovieCharacter mc) {
+        movieCharacters.add(mc);
+    }
+
+    public void setMovieCharacterSet(HashSet<MovieCharacter> mcs) {
+        movieCharacters = mcs;
+    }
+
+    public Set<MovieCharacter> getMovieCharacters() {
+        return movieCharacters;
     }
 }

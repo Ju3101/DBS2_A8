@@ -14,7 +14,29 @@ public class Genre {
 
     private String genre;
 
-    @ManyToMany(mappedBy = "genres, cascade = CascadeType.PERSIST")
+    @ManyToMany
     private Set<Movie> movies = new HashSet<>();
+
+    public Genre() {}
+
+    public Genre(String genre) {
+        this.genre = genre;
+    }
+
+    public void addMovie(Movie movie) {
+        movies.add(movie);
+    }
+
+    public int getId() {
+        return genreID;
+    }
+
+    public String getGenre() {
+        return genre;
+    }
+
+    public void setGenre(String genre) {
+        this.genre = genre;
+    }
 
 }

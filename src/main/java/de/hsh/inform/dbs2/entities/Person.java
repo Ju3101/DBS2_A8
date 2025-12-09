@@ -15,6 +15,24 @@ public class Person {
     @Column(nullable = false)
     private String name;
 
-    @OneToMany(mappedBy = "player", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "actor", cascade = CascadeType.PERSIST)
     private Set<MovieCharacter> movieCharacters = new HashSet<>();
+
+    public Person() {}
+
+    public Person(String name) {
+        this.name = name;
+    }
+
+    public void addMovieCharacter(MovieCharacter mc) {
+        movieCharacters.add(mc);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
