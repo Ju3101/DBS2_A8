@@ -13,6 +13,12 @@ public class MovieCharacter {
     private String alias;
     private int position;
 
+    @ManyToOne
+    private Person actor;
+
+    @ManyToOne
+    private Movie movie;
+
     public MovieCharacter() {
 
     }
@@ -22,12 +28,6 @@ public class MovieCharacter {
         this.alias = alias;
         this.position = position;
     }
-
-    @ManyToOne
-    private Person actor;
-
-    @ManyToOne
-    private Movie movie;
 
     public void setMovie(Movie movie) {
         this.movie = movie;
