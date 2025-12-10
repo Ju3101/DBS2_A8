@@ -110,8 +110,17 @@ public class MovieManager {
 
 
 		//Übernahme der Charactere
+		Set<MovieCharacter> originalCharacters = movie.getMovieCharacters();
+		List<CharacterDTO> dtoMovieCharacters = movieDTO.getCharacters();
+
+		System.out.println("Character aktualisieren");
 		movie.getMovieCharacters().clear();
-		em.flush();
+		int i = 1;
+		for (CharacterDTO cdto : dtoMovieCharacters) {
+			MovieCharacter mc = createMovieCharacter(cdto, movie, em, i);
+			originalCharacters.add(mc);
+			i++;
+		}
 
 /*		for (MovieCharacter movieCharacter : originalCharacters) {
 			for (CharacterDTO characterDTO : movieCharacters) {
