@@ -71,6 +71,7 @@ public class MovieManager {
 		EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager();
 		try {
 			em.getTransaction().begin();
+			System.out.println("INSERTUPDATE()");
 
 			Movie movie = movieDTO.getId() != null ? em.find(Movie.class, movieDTO.getId()) : null;
 
@@ -102,16 +103,17 @@ public class MovieManager {
 		//Übernahme der Genres
 		movie.getGenres().clear();
 
-		TypedQuery<Genre> genreQuery = em.createQuery("SELECT g  FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
+		TypedQuery<Genre> genreQuery = em.createQuery("SELECT g FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
 		Set<String> genreName = movieDTO.getGenres();
 		genreQuery.setParameter("genreParam", genreName);
 		movie.getGenres().addAll(genreQuery.getResultList());
 
 
 		//Übernahme der Charactere
-		Set<MovieCharacter> originalCharacters = movie.getMovieCharacters();
-		List<CharacterDTO> movieCharacters = movieDTO.getCharacters();
-		for (MovieCharacter movieCharacter : originalCharacters) {
+		movie.getMovieCharacters().clear();
+		em.flush();
+
+/*		for (MovieCharacter movieCharacter : originalCharacters) {
 			for (CharacterDTO characterDTO : movieCharacters) {
 				if(movieCharacter.getCharacter().equals(characterDTO.getCharacter())
 						&& movieCharacter.getAlias().equals(characterDTO.getAlias())
@@ -121,10 +123,10 @@ public class MovieManager {
 					originalCharacters.add(createMovieCharacter(characterDTO, movie, em, originalCharacters.size()+1));
 				}
 			}
-		}
+		}*/
 	}
 
-	private static MovieCharacter createMovieCharacter(CharacterDTO characterDTO, Movie movie, EntityManager em, int pos) throws Exception { em
+	private static MovieCharacter createMovieCharacter(CharacterDTO characterDTO, Movie movie, EntityManager em, int pos) throws Exception {
 		TypedQuery<Person> personQuery = em.createQuery("SELECT p  FROM Person p WHERE p.name = :personParam", Person.class);
 		personQuery.setParameter("personParam", characterDTO.getPlayer());
 		MovieCharacter movieCharacter = new MovieCharacter(characterDTO.getCharacter(), characterDTO.getAlias(), pos);
@@ -167,45 +169,49 @@ public class MovieManager {
 	 * @throws Exception Z.B. bei Datenbank-Fehlern oder falls der Movie nicht existiert.
 	 */
 	public MovieDTO getMovie(int movieId) throws Exception {
+		EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager();
+		try {
+			em.getTransaction().begin();
 
-        try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
-            try {
-                em.getTransaction().begin();
-                //Neues MovieDTO definieren und Movie-Objekt, anhand des Parameters movieId aus der DB abfragen.
-                MovieDTO dto = new MovieDTO();
-                TypedQuery<Movie> tq = em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId", Movie.class);
-                tq.setParameter("movieId", movieId);
-                Movie movie = tq.getSingleResult();
+			MovieDTO movieDto = new MovieDTO();
+			TypedQuery<Movie> tqm = em.createQuery("SELECT m FROM Movie AS m WHERE m.id = :movieId", Movie.class)
+					.setParameter("movieId", movieId);
 
-                //Erste Parameter des MovieDTOs mithilfe des Movie-Objektes setzen.
-                dto.setId(movie.getId());
-                dto.setTitle(movie.getTitle());
-                dto.setType(movie.getType());
+			//Dem MovieDTO einzutragende Attribute vorbereiten
+			Movie movie = tqm.getSingleResult();
 
-                //Liste an Genre-Namen (Strings) per Schleife mithilfe des Set<Genre> vom Movie-Objekt befüllen,
-                //weil das MovieDTO-Objekt die Genres nur in Form einer String-Collection speichert
-                Set<String> genreStrings = new HashSet<>();
-                for (Genre g : movie.getGenres()) {
-                    genreStrings.add(g.getGenre());
-                }
-                dto.setGenres(genreStrings);
+			if (movie == null) {
+				throw new DoesNotExistException("Fehler bei Erzeugung eines MovieDTO: Movie-Objekt nicht gefunden!");
+			}
 
-                //CharacterDTO-Liste erstellen und mithilfe der MovieCharacter-Collection des Movie-Objektes befüllen
-                List<CharacterDTO> characterDTOs = new ArrayList<>();
-                for (MovieCharacter mc : movie.getMovieCharacters()) {
-                    characterDTOs.add(new CharacterDTO(mc.getCharacter(), mc.getAlias(), mc.getActor().getName()));
-                }
-                dto.setCharacters(characterDTOs);
+			Set<String> genreStrings = new HashSet<>();
+			List<CharacterDTO> characterDTOs = new ArrayList<>();
 
-                em.getTransaction().commit();
-				return dto;
+			//Dem MovieDTO die Attribute zufügen
+			for (Genre g : movie.getGenres()) {
+				genreStrings.add(g.getGenre());
+			}
+			for (MovieCharacter mc : movie.getMovieCharacters()) {
+				characterDTOs.add(createCharacterDTO(mc));
+			}
+			movieDto.setCharacters(characterDTOs);
+			movieDto.setGenres(genreStrings);
+			movieDto.setId(movie.getId());
+			movieDto.setTitle(movie.getTitle());
+			movieDto.setType(movie.getType());
+			movieDto.setYear(movie.getYear());
 
-            } catch (Exception e) {
-                e.printStackTrace();
-                em.getTransaction().rollback();
-                throw new DoesNotExistException("Could not find movie by Id: " + movieId);
-            }
-        }
+			em.getTransaction().commit();
+			return movieDto;
+
+		} catch (Exception e) {
+			em.getTransaction().rollback();
+			e.printStackTrace();
+			throw new Exception("Fehler bei Erstellung eines MovieDTOs!");
+		}
 	}
 
+	private CharacterDTO createCharacterDTO(MovieCharacter mc) {
+		return new CharacterDTO(mc.getCharacter(), mc.getAlias(), mc.getActor().getName());
+	}
 }

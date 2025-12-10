@@ -18,6 +18,7 @@ import java.util.List;
 public class Main {
 
     public static void main(String [] args) {
+
         SwingUtilities.invokeLater(() -> {
             new Main().run();
         });
@@ -29,6 +30,11 @@ public class Main {
 
         }
 
+/*        try {
+            TestClient.insertMovieCharacter(502, "Han-Solo", "Han", "Harrison");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }*/
     }
 
     public void run() {

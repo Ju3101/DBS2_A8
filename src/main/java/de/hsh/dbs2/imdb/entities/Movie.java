@@ -46,6 +46,10 @@ public class Movie {
         this.year = year;
     }
 
+    public int getYear() {
+        return year;
+    }
+
     public void setGenres(Set<Genre> genres) {
         this.genres = genres;
     }

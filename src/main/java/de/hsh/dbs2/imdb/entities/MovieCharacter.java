@@ -41,6 +41,10 @@ public class MovieCharacter {
         return movCharID;
     }
 
+    public void setCharacter(String character) {
+        this.character = character;
+    }
+
     public String getCharacter() {
         return character;
     }
@@ -49,8 +53,16 @@ public class MovieCharacter {
         return alias;
     }
 
+    public void setAlias(String alias) {
+        this.alias = alias;
+    }
+
     public int getPosition() {
         return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
     }
 
     public Person getActor() {
