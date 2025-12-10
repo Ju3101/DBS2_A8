@@ -101,13 +101,15 @@ public class MovieManager {
 		movie.setType(movieDTO.getType());
 
 		//Übernahme der Genres
+		for (Genre g : movie.getGenres()) {
+			g.removeMovie(movie);
+		}
 		movie.getGenres().clear();
 
 		TypedQuery<Genre> genreQuery = em.createQuery("SELECT g FROM Genre g WHERE g.genre IN :genreParam", Genre.class);
 		Set<String> genreName = movieDTO.getGenres();
 		genreQuery.setParameter("genreParam", genreName);
 		movie.getGenres().addAll(genreQuery.getResultList());
-
 
 		//Übernahme der Charactere
 		Set<MovieCharacter> originalCharacters = movie.getMovieCharacters();

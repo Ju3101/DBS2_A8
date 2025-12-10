@@ -18,7 +18,7 @@ public class Movie {
 
     private int year;
 
-    @ManyToMany(mappedBy = "movies", cascade = CascadeType.ALL)
+    @ManyToMany
     private Set<Genre> genres = new HashSet<>();
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval=true)
@@ -52,6 +52,10 @@ public class Movie {
 
     public void setGenres(Set<Genre> genres) {
         this.genres = genres;
+    }
+
+    public void removeGenre(Genre genre) {
+        genres.remove(genre);
     }
 
     public String getTitle() {

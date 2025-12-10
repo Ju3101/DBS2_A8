@@ -14,7 +14,7 @@ public class Genre {
 
     private String genre;
 
-    @ManyToMany
+    @ManyToMany(mappedBy = "genres", cascade = CascadeType.ALL)
     private Set<Movie> movies = new HashSet<>();
 
     public Genre() {}
@@ -25,6 +25,10 @@ public class Genre {
 
     public void addMovie(Movie movie) {
         movies.add(movie);
+    }
+
+    public void removeMovie(Movie movie) {
+        movies.remove(movie);
     }
 
     public int getId() {
