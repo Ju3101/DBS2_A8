@@ -21,7 +21,7 @@ public class Movie {
     @ManyToMany(mappedBy = "movies", cascade = CascadeType.PERSIST)
     private Set<Genre> genres = new HashSet<>();
 
-    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST)
+    @OneToMany(mappedBy = "movie", cascade = CascadeType.PERSIST, orphanRemoval=true)
     private Set<MovieCharacter> movieCharacters = new HashSet<>();
 
     public Movie(String title, String type, int year) {
