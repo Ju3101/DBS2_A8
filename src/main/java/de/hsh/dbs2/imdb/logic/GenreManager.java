@@ -16,20 +16,23 @@ public class GenreManager {
 	 */
 	public List<String> getGenres() throws Exception {
 
-        try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
+        EntityManager em = null;
+        try {
+            em = EMFSingleton.getEntityManagerFactory().createEntityManager();
+            em.getTransaction().begin();
+            List<String> genres = em.createQuery("SELECT g.genre FROM Genre AS g").getResultList();
+            em.getTransaction().commit();
+            em.close();
+            return genres;
 
-            try {
-                em.getTransaction().begin();
-                List<String> genres = em.createQuery("SELECT g.genre FROM Genre AS g").getResultList();
-                em.getTransaction().commit();
-                return genres;
-            } catch (Exception e) {
-                e.printStackTrace();
-                em.getTransaction().rollback();
-            }
         } catch (Exception e) {
+
             e.printStackTrace();
+            if (em != null) {
+                em.getTransaction().rollback();
+                em.close();
+            }
+            throw e;
         }
-		return null;
 	}
 }

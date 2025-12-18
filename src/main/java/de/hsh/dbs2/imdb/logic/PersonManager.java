@@ -14,6 +14,7 @@ public class PersonManager {
 	 * @throws Exception Beschreibt evtl. aufgetretenen Fehler
 	 */
 	public List<String> getPersonList(String name) throws Exception {
+
 		try (EntityManager em = EMFSingleton.getEntityManagerFactory().createEntityManager()) {
 
 			try {

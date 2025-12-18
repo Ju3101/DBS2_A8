@@ -123,18 +123,6 @@ public class MovieManager {
 			originalCharacters.add(mc);
 			i++;
 		}
-
-/*		for (MovieCharacter movieCharacter : originalCharacters) {
-			for (CharacterDTO characterDTO : movieCharacters) {
-				if(movieCharacter.getCharacter().equals(characterDTO.getCharacter())
-						&& movieCharacter.getAlias().equals(characterDTO.getAlias())
-						&& movieCharacter.getActor().getName().equals(characterDTO.getPlayer())) {
-					continue;
-				} else {
-					originalCharacters.add(createMovieCharacter(characterDTO, movie, em, originalCharacters.size()+1));
-				}
-			}
-		}*/
 	}
 
 	private static MovieCharacter createMovieCharacter(CharacterDTO characterDTO, Movie movie, EntityManager em, int pos) throws Exception {
